@@ -21,31 +21,49 @@ const Radio = () => {
 
   const fetchStations = async () => {
     try {
-      const apiMirrors = [
-        'https://de1.api.radio-browser.info',
-        'https://fr1.api.radio-browser.info',
-        'https://nl1.api.radio-browser.info',
-        'https://at1.api.radio-browser.info'
-      ];
-
-      for (const mirror of apiMirrors) {
+      // Using the all.api endpoint which redirects to a working server
+      const corsProxy = 'https://cors-anywhere.herokuapp.com/';
+      const apiUrl = 'https://all.api.radio-browser.info/json/stations/bycountrycodeexact/in';
+      
+      try {
+        const response = await fetch(`${apiUrl}?limit=1300&order=random`, {
+          headers: {
+            'Origin': window.location.origin
+          }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          console.log(`Loaded ${data.length} stations from primary API`);
+          const stationsWithIds = data.map(station => ({
+            ...station,
+            id: station.stationuuid || station.id || Math.random().toString(36).substr(2, 9)
+          }));
+          setStations(stationsWithIds);
+        } else {
+          throw new Error('Failed to fetch stations');
+        }
+      } catch (error) {
+        console.error('Error fetching from API:', error);
+        
+        // Fallback API call using public API
         try {
-          const response = await fetch(`${mirror}/json/stations/bycountry/india?limit=1304&order=random`, {
-            timeout: 5000,
-            mode: 'cors'
-          });
+          const response = await fetch('https://de1.api.radio-browser.info/json/stations/search?limit=1300&countrycode=in&order=random');
+          
           if (response.ok) {
             const data = await response.json();
+            console.log(`Loaded ${data.length} stations from fallback API`);
             const stationsWithIds = data.map(station => ({
               ...station,
               id: station.stationuuid || station.id || Math.random().toString(36).substr(2, 9)
             }));
             setStations(stationsWithIds);
-            break;
+          } else {
+            throw new Error('Failed to fetch stations from fallback');
           }
-        } catch (error) {
-          console.log(`Mirror ${mirror} failed, trying next...`);
-          continue;
+        } catch (fallbackError) {
+          console.error('Fallback API failed:', fallbackError);
+          throw fallbackError;
         }
       }
     } catch (error) {
