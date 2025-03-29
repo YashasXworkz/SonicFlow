@@ -4,10 +4,11 @@ import { RadioProvider } from './context/RadioContext';
 import Sidebar from "./components/Sidebar";
 import Player from "./components/Player";
 import Display from "./components/Display";
-import { PlayerContext } from "./context/PlayerContext";
+import { PlayerContext, PlayerContextProvider } from "./context/PlayerContext";
 import Radio from './components/Radio';
+import Search from './components/Search';
 
-const App = () => {
+const AppContent = () => {
   const { audioRef, track, songsData } = useContext(PlayerContext);
 
   return (
@@ -18,10 +19,13 @@ const App = () => {
             <>
               <div className="h-[90%] flex">
                 <Sidebar />
-                <Routes>
-                  <Route path="/" element={<Display />} />
-                  <Route path="/radio" element={<Radio />} />
-                </Routes>
+                <div className="flex-1 overflow-auto">
+                  <Routes>
+                    <Route path="/*" element={<Display />} />
+                    <Route path="/radio" element={<Radio />} />
+                    <Route path="/search/:query" element={<Search />} />
+                  </Routes>
+                </div>
               </div>
               <Player />
             </>
@@ -35,6 +39,14 @@ const App = () => {
         ></audio>
       </div>
     </RadioProvider>
+  );
+};
+
+const App = () => {
+  return (
+    <PlayerContextProvider>
+      <AppContent />
+    </PlayerContextProvider>
   );
 };
 

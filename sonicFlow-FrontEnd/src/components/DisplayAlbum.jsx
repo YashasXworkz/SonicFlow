@@ -34,9 +34,8 @@ const DisplayAlbum = ({ album }) => {
               src={assets.spotify_logo}
               alt=""
             />
-            <b>Spotify</b>
-            •1,323,154 likes •<b> 50 songs,</b>
-            about 2 hr 30 min •
+            <b> Spotify</b>
+            <span className="text-gray-300"> • 1,323,154 likes • 50 songs, about 2 hr 30 min</span>
           </p>
         </div>
       </div>

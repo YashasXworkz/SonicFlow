@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
+import { PlayerContext } from './PlayerContext';
 
 export const RadioContext = createContext();
 
@@ -8,13 +9,37 @@ export const RadioProvider = ({ children }) => {
   const [currentStation, setCurrentStation] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [audio] = useState(new Audio());
+  
+  // Access PlayerContext to coordinate playback
+  const playerContext = useContext(PlayerContext);
 
   useEffect(() => {
-    const handlePlaying = () => setIsPlaying(true);
-    const handlePause = () => setIsPlaying(false);
+    const handlePlaying = () => {
+      setIsPlaying(true);
+      // Pause music player when radio starts playing
+      if (playerContext && playerContext.playStatus) {
+        playerContext.pause();
+      }
+      // Update the radio state in PlayerContext
+      if (playerContext && playerContext.updateRadioState) {
+        playerContext.updateRadioState(true, stopRadio);
+      }
+    };
+    
+    const handlePause = () => {
+      setIsPlaying(false);
+      // Update the radio state in PlayerContext
+      if (playerContext && playerContext.updateRadioState) {
+        playerContext.updateRadioState(false, stopRadio);
+      }
+    };
     const handleError = () => {
       setIsPlaying(false);
       setCurrentStation(null);
+      // Update the radio state in PlayerContext
+      if (playerContext && playerContext.updateRadioState) {
+        playerContext.updateRadioState(false, stopRadio);
+      }
     };
 
     audio.addEventListener('playing', handlePlaying);
@@ -26,7 +51,15 @@ export const RadioProvider = ({ children }) => {
       audio.removeEventListener('pause', handlePause);
       audio.removeEventListener('error', handleError);
     };
-  }, [audio]);
+  }, [audio, playerContext]);
+
+  // Listen to playerContext changes to pause radio when music starts
+  useEffect(() => {
+    if (playerContext && playerContext.playStatus && isPlaying) {
+      audio.pause();
+      setIsPlaying(false);
+    }
+  }, [playerContext?.playStatus, isPlaying, audio]);
 
   const playStation = (station) => {
     if (currentStation?.id === station.id && isPlaying) {
@@ -34,6 +67,11 @@ export const RadioProvider = ({ children }) => {
       setIsPlaying(false);
       setCurrentStation(null);
     } else {
+      // Pause music player if it's playing
+      if (playerContext && playerContext.playStatus) {
+        playerContext.pause();
+      }
+      
       if (currentStation) {
         audio.pause();
       }

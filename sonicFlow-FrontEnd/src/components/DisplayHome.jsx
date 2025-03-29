@@ -1,9 +1,8 @@
 import React, {useContext} from 'react'
 import Navbar from './Navbar'
 import AlbumItem from './AlbumItem'
-
- import SongItem from './songItem'
- import { PlayerContext } from '../context/PlayerContext'
+import SongItem from './songItem'
+import { PlayerContext } from '../context/PlayerContext'
 
 // const DisplayHome = () => {
 

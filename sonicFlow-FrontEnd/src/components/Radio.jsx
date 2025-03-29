@@ -13,7 +13,7 @@ const Radio = () => {
   } = useRadio();
   const [searchTerm, setSearchTerm] = useState('');
 
-  const defaultRadioImage = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTIgMkM2LjQ4IDIgMiA2LjQ4IDIgMTJzNC40OCAxMCAxMCAxMCAxMC00LjQ4IDEwLTEwUzE3LjUyIDIgMTIgMnptMCAxNC41Yy0yLjQ5IDAtNC41LTIuMDEtNC41LTQuNVM5LjUxIDcuNSAxMiA3LjVzNC41IDIuMDEgNC41IDQuNS0yLjAxIDQuNS00LjUgNC41em0wLTUuNWMtLjU1IDAtMSAuNDUtMSAxczAuNDUgMSAxIDEgMS0wLjQ1IDEtMS0wLjQ1LTEtMS0xeiIgZmlsbD0iI2ZmZiIvPjwvc3ZnPg==';
+  const defaultRadioImage = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTIgMkM2LjQ4IDIgMiA2LjQ4IDIgMTJzNC40OCAxMCAxMCAxMCAxMC00LjQ4IDEwLTEwUzE3LjUyIDIgMTIgMnptMCAxNC41Yy0yLjQ5IDAtNC41LTIuMDEtNC41LTQuNVM5LjUxIDcuNSAxMiA3LjVzNC41IDIuMDEgNC41IDQuNS0yLjAxIDQuNS00LjUgNC41em0wLTUuNWMtLjU1IDAtMSAwLjQ1LTItMSAxczAuNDUgMSAxIDEgMS0wLjQ1IDEtMS0wLjQ1LTEtMS0xeiIgZmlsbD0iI2ZmZiIvPjwvc3ZnPg==';
 
   useEffect(() => {
     fetchStations();
@@ -103,9 +103,9 @@ const Radio = () => {
   );
 
   return (
-    <div className="w-full h-[calc(100vh-120px)] overflow-y-auto relative z-0 px-6 mt-5">
-      <div className="flex justify-between items-center mb-6 sticky top-0 z-10 py-4 bg-gradient-to-r from-[#fef08a] via-[#84cc16] to-[#16a34a] px-4 rounded-md">
-        <h2 className="text-2xl font-semibold ">Radio Stations</h2>
+    <div className="w-[100%] m-2 px-6 pt-4 rounded bg-[#121212] text-white overflow-auto lg-ml-0">
+      <div className="flex justify-between items-center mb-6 sticky top-0 z-10 py-4 bg-gradient-to-bl from-[#84cc16] via-[#16a34a] to-[#0f766e] px-4 rounded-md">
+        <h2 className="text-2xl font-semibold">Radio Stations</h2>
         <div className="relative">
           <input
             type="text"
@@ -118,8 +118,11 @@ const Radio = () => {
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center h-40">
-          <p className="text-gray-400 text-lg">Loading stations...</p>
+        <div className="flex items-center justify-center h-[calc(100vh-200px)]">
+          <div className="text-center">
+            <div className="w-10 h-10 border-4 border-green-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-gray-400 text-lg">Loading stations...</p>
+          </div>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 pb-4 mx-auto max-w-[2000px]">

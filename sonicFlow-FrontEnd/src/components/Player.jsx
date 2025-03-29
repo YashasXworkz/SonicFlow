@@ -7,6 +7,8 @@ const Player = () => {
     seekSong,
     seekBg,
     seekBar,
+    volumeBg,
+    volumeBar,
     playStatus,
     play,
     pause,
@@ -18,10 +20,27 @@ const Player = () => {
     setIsShuffle,
     isLoop,
     setIsLoop,
+    adjustVolume,
+    toggleMute,
+    isMuted,
+    volume
   } = useContext(PlayerContext);
 
   const toggleShuffle = () => setIsShuffle((prev) => !prev);
   const toggleLoop = () => setIsLoop((prev) => !prev);
+  
+  // Get correct volume icon based on volume level
+  const getVolumeIcon = () => {
+    if (isMuted || volume === 0) {
+      return assets.volume_mute_icon || assets.volume_icon; // Fallback if mute icon not available
+    } else if (volume < 0.4) {
+      return assets.volume_low_icon || assets.volume_icon;
+    } else if (volume < 0.7) {
+      return assets.volume_medium_icon || assets.volume_icon;
+    } else {
+      return assets.volume_icon;
+    }
+  };
 
   return track ? (
     <div className="fixed bottom-0 left-0 right-0 z-50">
@@ -102,8 +121,22 @@ const Player = () => {
           <img className="w-4" src={assets.mic_icon} alt="mic" />
           <img className="w-4" src={assets.queue_icon} alt="queue" />
           <img className="w-4" src={assets.speaker_icon} alt="speaker" />
-          <img className="w-4" src={assets.volume_icon} alt="volume" />
-          <div className="w-20 bg-slate-50 h-1 rounded"></div>
+          <img 
+            className="w-4 cursor-pointer" 
+            src={getVolumeIcon()} 
+            alt="volume"
+            onClick={toggleMute} 
+          />
+          <div 
+            ref={volumeBg}
+            onClick={adjustVolume}
+            className="w-20 bg-gray-400 h-1 rounded-full cursor-pointer"
+          >
+            <hr
+              ref={volumeBar}
+              className="h-1 border-none w-[70%] bg-white rounded-full"
+            />
+          </div>
           <img
             className="w-4"
             src={assets.mini_player_icon}

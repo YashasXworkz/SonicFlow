@@ -11,6 +11,8 @@ export const PlayerContextProvider = ({ children }) => {
   const audioRef = useRef();
   const seekBg = useRef();
   const seekBar = useRef();
+  const volumeBg = useRef();
+  const volumeBar = useRef();
 
   const url = "http://localhost:4000"; // Fix the URL typo
 
@@ -19,6 +21,8 @@ export const PlayerContextProvider = ({ children }) => {
   const [albumsData, setAlbumsData] = useState([]);
   const [track, setTrack] = useState(null); // Default track should be null, not undefined
   const [playStatus, setPlayStatus] = useState(false);
+  const [volume, setVolume] = useState(0.7); // Default volume 70%
+  const [isMuted, setIsMuted] = useState(false); // Track mute state
   const [time, setTime] = useState({
     currentTime: {
       second: 0,
@@ -30,9 +34,74 @@ export const PlayerContextProvider = ({ children }) => {
     },
   });
 
+  // Store radio state to coordinate playback
+  const [radioState, setRadioState] = useState({
+    isRadioPlaying: false,
+    pauseRadio: null,
+  });
+
+  // Set initial volume when audio is ready
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = volume;
+      // Update volume bar if ref is available
+      if (volumeBar.current) {
+        volumeBar.current.style.width = `${volume * 100}%`;
+      }
+    }
+  }, [volume, audioRef.current]);
+
+  // Volume control functions
+  const adjustVolume = (e) => {
+    if (audioRef.current && volumeBg.current) {
+      const newVolume = Math.max(0, Math.min(1, e.nativeEvent.offsetX / volumeBg.current.offsetWidth));
+      audioRef.current.volume = newVolume;
+      setVolume(newVolume);
+      
+      // Update volume bar
+      if (volumeBar.current) {
+        volumeBar.current.style.width = `${newVolume * 100}%`;
+      }
+      
+      // If volume is set above 0, we're no longer muted
+      if (newVolume > 0 && isMuted) {
+        setIsMuted(false);
+      } else if (newVolume === 0 && !isMuted) {
+        setIsMuted(true);
+      }
+    }
+  };
+
+  const toggleMute = () => {
+    if (audioRef.current) {
+      if (!isMuted) {
+        // Store current volume before muting
+        audioRef.current.volume = 0;
+        setIsMuted(true);
+        // Update volume bar
+        if (volumeBar.current) {
+          volumeBar.current.style.width = '0%';
+        }
+      } else {
+        // Restore previous volume
+        audioRef.current.volume = volume || 0.7;
+        setIsMuted(false);
+        // Update volume bar
+        if (volumeBar.current) {
+          volumeBar.current.style.width = `${(volume || 0.7) * 100}%`;
+        }
+      }
+    }
+  };
+
   // Play and Pause functions
   const play = () => {
     if (audioRef.current) {
+      // Pause radio if it's playing
+      if (radioState.isRadioPlaying && radioState.pauseRadio) {
+        radioState.pauseRadio();
+      }
+      
       audioRef.current.play();
       setPlayStatus(true);
     }
@@ -46,6 +115,11 @@ export const PlayerContextProvider = ({ children }) => {
   };
 
   const playWithId = async (id) => {
+    // Pause radio if it's playing
+    if (radioState.isRadioPlaying && radioState.pauseRadio) {
+      radioState.pauseRadio();
+    }
+    
     await songsData.map((item) => {
       if (id === item._id) {
         setTrack(item);
@@ -56,6 +130,11 @@ export const PlayerContextProvider = ({ children }) => {
   };
 
   const previous = async () => {
+    // Pause radio if it's playing
+    if (radioState.isRadioPlaying && radioState.pauseRadio) {
+      radioState.pauseRadio();
+    }
+    
     songsData.map(async (item, index) => {
       if (track._id === item._id && index > 0) {
         await setTrack(songsData[index - 1]);
@@ -66,12 +145,25 @@ export const PlayerContextProvider = ({ children }) => {
   };
 
   const next = async () => {
+    // Pause radio if it's playing
+    if (radioState.isRadioPlaying && radioState.pauseRadio) {
+      radioState.pauseRadio();
+    }
+    
     songsData.map(async (item, index) => {
       if (track._id === item._id && index < songsData.length) {
         await setTrack(songsData[index + 1]);
         await audioRef.current.play();
         setPlayStatus(true);
       }
+    });
+  };
+
+  // Method for RadioContext to update its state
+  const updateRadioState = (isPlaying, pauseFunction) => {
+    setRadioState({
+      isRadioPlaying: isPlaying,
+      pauseRadio: pauseFunction
     });
   };
 
@@ -149,10 +241,14 @@ export const PlayerContextProvider = ({ children }) => {
     audioRef,
     seekBg,
     seekBar,
+    volumeBg,
+    volumeBar,
     track,
     setTrack,
     playStatus,
     setPlayStatus,
+    volume,
+    isMuted,
     time,
     setTime,
     play,
@@ -161,8 +257,11 @@ export const PlayerContextProvider = ({ children }) => {
     previous,
     next,
     seekSong,
+    adjustVolume,
+    toggleMute,
     songsData,
     albumsData,
+    updateRadioState
   };
 
   return (

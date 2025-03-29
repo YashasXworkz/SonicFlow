@@ -29,7 +29,7 @@ const Display = () => {
   return (
     <div
       ref={displayRef}
-      className="w-[100%] m-2 px-6 pt-4 rounded bg-[#121212] text-white overflow-auto lg:w-[75%] lg-ml-0"
+      className="w-[100%] m-2 px-6 pt-4 rounded bg-[#121212] text-white overflow-auto lg-ml-0"
     >
       {albumsData.length > 0 ? (
         <Routes>
