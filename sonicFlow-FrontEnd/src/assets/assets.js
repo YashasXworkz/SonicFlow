@@ -21,6 +21,7 @@ import volume_icon from "./volume.png";
 import arrow_right from "./right_arrow.png";
 import arrow_left from "./left_arrow.png";
 import spotify_logo from "./spotify_logo.png";
+import spotify_gif from "./Spotify.gif";
 import clock_icon from "./clock_icon.png";
 import radio_icon from "./radio.png";
 import img1 from "./img1.jpg";
@@ -67,6 +68,7 @@ export const assets = {
   arrow_left,
   arrow_right,
   spotify_logo,
+  spotify_gif,
   clock_icon,
   radio_icon,
 };
